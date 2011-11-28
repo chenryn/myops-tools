@@ -1,0 +1,67 @@
+<html>
+<head>
+<title>ÈèÕ¨Ó21V-CDNÁ³Ìµͳ</title>
+<style type="text/css">
+.style1 {
+text-align: center;
+}
+</style>
+</head>
+
+<body>
+<center>
+<h1>Designed for support@21vianet.com in RT table.</h1>
+<hr>
+<form method="post"  action="/cgi-bin/rt.cgi">
+<table>
+<tr>
+<td colspan="2">
+<textarea name="config" style="width: 700px; height: 200px" rows="1" cols="20" onmouseover="focus()" onfocus="if(value=='Ô´ËîsquidÅÖ£¬»ò߲âurl£¬עÒ·ÖÐ´') {value="}" onmouseout="blur()" onblur="if (value==") {value='Ô´ËîsquidÅÖ£¬»òâurl£¬עÒ·ÖÐ´'}">Ô´ËîsquidÅÖ£¬»òâurl£¬עÒ·ÖÐ´</textarea></td>
+</tr>
+<tr>
+<td>
+<textarea name="iplist" style="width: 200px; height: 250px" rows="1" cols="20" onmouseover="focus()" onfocus="if(value=='Ô´Ëî·þÎÆ×IP£¬עÒÃÑ¡¢¹ã¡¢ÉͷÍͨûVPN¹þ') {value="}" onmouseout="blur()" onblur="if (value==") {value='Ô´Ëî·þÎÆ×IP£¬עÒÃÑ¡¢¹ã¡¢ÉͷÍͨûVPN¹þ'}">Ô´ËëÎÆ×IP£¬עÒÃÑ¡¢¹ã¡¢ÉͷÍͨûVPN¹þ</textarea></td>
+<td>
+<input name="custom" type="text" style="width: 246px" value="Ô´Ëî¿ͻ§¼ò onfocus="if(value=='Ô´Ëî¿ͻ§¼ò) {value="}" onblur="if (value==") {value='Ô´Ëî¿ͻ§¼ò}" />
+<br />
+<input name="action" type="radio" value="add" />Ì¼Ӹÿͻ§¼ÓÙä<br />
+<input name="action" type="radio" value="del" />ɾ³ý§¼ÓÙä<br />
+<input name="action" type="radio" value="change" />¸üͻ§¼ÓÙä<br />
+<input name="action" type="radio" value="conf" />¼ìÅÖͳһÐ<br />
+<input name="action" type="radio" value="wget" />wget·½ʽ¼ì£¨httpsµÈØâ¿ööbr />
+<input name="action" type="radio" value="curl" checked="checked" />curl·½ʽ¼ì£¨·5Á´¡¢¹ýä¼öbr />
+<input name="submit" type="submit"/></td>
+</tr>
+</table>
+</form>
+</center>
+
+<div id="ShowAD" style="position:absolute;z-index:100;font-size:12px">
+<div style="width:135;height:18px;font-size:14px;font-weight:bold;text-align:left;cursor:hand;" onClick="closead();"><font color="ff0000">É¼¶ÌÐ</font></div>
+v0.1.0:ÅÖÎ¼þ´æÖÐ£¬µ÷ű¾conf.shÔÐ£»<br>
+v0.1.1:ÐÔwget²â¹¦Ä£¬²ÉÃosts°󶨷½ʽ£»<br>
+v0.2.0:ÐÔcurl²â¡¢ÅÖÎ¼þУ¶Թ¦Ä£¬²ÉÃ¸¶¨´úÊ£¬±Üâ¸ÄostsȨÏÎÌ£»<br>
+v0.3.0:¸ü÷ַ¢¹¦Ä£¬ֱ½Óðå£»<br>
+v0.3.1:¼Ó¿wgetºÍurl²â¶¨Ö¹¦Ä£¬֧³ÖTTPS¡¢·5Á´¡¢¹ýä²飻<br>
+v0.3.2:֧³ÖrlÅ²â£»<br>
+v0.3.3:¼Ó¿ÊÈIP×¶¯ʶ±ðbr>
+¸üʣ¬¾´ÇÆ´ý>
+</div>
+<script language="javascript">
+var bodyfrm = ( document.compatMode.toLowerCase()=="css1compat" ) ? document.documentElement : document.body;
+var adst = document.getElementById("ShowAD").style;
+adst.top = ( bodyfrm.clientHeight -300-22 ) + "px";
+adst.left = ( bodyfrm.clientWidth -200 ) + "px";
+function moveR() {
+adst.top = ( bodyfrm.scrollTop + bodyfrm.clientHeight ? 300-22) + "px";
+adst.left = ( bodyfrm.scrollLeft + bodyfrm.clientWidth ? 200 ) + "px";
+}
+setInterval("moveR();", 80);
+function closead()
+{
+adst.display='none';
+}
+</script>
+
+</body>
+</html>

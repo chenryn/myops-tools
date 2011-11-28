@@ -1,0 +1,15 @@
+<link type="text/css" rel="stylesheet" href="css/calendar.css" />
+<script language="javascript" src="javascripts/calendar.js"></script>
+select_time<HR>
+<form action="/cdncharts" method="get" target="main">
+<LI>begin</LI>
+<input name="timefrom" type="text" id="timefrom" style="width:100%;" onclick="displayCalendar(this, 'yyyy-mm-dd hh:ii', this, true, '');"/>
+<LI>end</LI>
+<input name="timeto" type="text" id="timeto" style="width:100%;" onclick="displayCalendar(this, 'yyyy-mm-dd hh:ii', this, true, '');"/><HR>
+<select name="chartstype" id="chartstype">
+<option value="area">area</option>
+<option value="isp">isp</option>
+<option value="time" selected>time</option>
+</select>
+<input type="submit" value="submit" id="submit">
+</form>

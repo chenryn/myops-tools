@@ -1,0 +1,117 @@
+#!/usr/bin/perl -w
+use strict;
+use Net::SNMP;
+use Getopt::Long;
+use lib "/usr/local/nagios/libexec";
+use utils qw(%ERRORS $TIMEOUT);
+my $o_host =    undef;          # hostname
+my $o_community = undef;        # community
+my $o_port =    161;            # port
+my $o_warn =    undef;          # warning limit
+my $o_crit=     undef;          # critical limit
+my $o_timeout= 10;
+my $exit_code = undef;
+my $o_type=undef;
+my $output=undef;
+my $o_perf= undef;
+my %oids = (
+'cpuUsage'                      => ".1.3.6.1.4.1.789.1.2.1.3.0",
+'globalStatus'                  => ".1.3.6.1.4.1.789.1.2.2.4.0",
+'nfsHighOps'                    => ".1.3.6.1.4.1.789.1.2.2.5.0",
+'nfsLowOps'                       => ".1.3.6.1.4.1.789.1.2.2.6.0",
+'netRecHighBytes'                   => ".1.3.6.1.4.1.789.1.2.2.11.0",
+'netRecLowBytes'                    => ".1.3.6.1.4.1.789.1.2.2.12.0",
+'netSentHighBytes'                => ".1.3.6.1.4.1.789.1.2.2.13.0",
+'netSentLowBytes'                   => ".1.3.6.1.4.1.789.1.2.2.14.0",
+'diskReadHighBytes'               => ".1.3.6.1.4.1.789.1.2.2.15.0",
+'diskReadLowBytes'                => ".1.3.6.1.4.1.789.1.2.2.16.0",
+'diskWriteHighBytes'            => ".1.3.6.1.4.1.789.1.2.2.17.0",
+'diskWriteLowBytes'               => ".1.3.6.1.4.1.789.1.2.2.18.0",
+);
+my @oidlist=($oids{nfsHighOps},$oids{nfsLowOps});
+sub check_options {
+Getopt::Long::Configure ("bundling");
+GetOptions(
+'H:s'   => \$o_host,            'hostname:s'    => \$o_host,
+'p:i'   => \$o_port,            'port:i'        => \$o_port,
+'C:s'   => \$o_community,       'community:s'   => \$o_community,
+'c:s'   => \$o_crit,            'critical:s'    => \$o_crit,
+'w:s'   => \$o_warn,            'warn:s'        => \$o_warn,
+#       'T:s'   => \$o_type,
+);
+}
+########## MAIN #######
+check_options();
+# Connect to host
+my ($session,$error);
+#¹ؼü´½¨һ¸ösionl½ӱ»¼àÖ»úession, $error) = Net::SNMP->session(
+-hostname  => $o_host,
+-community => $o_community,
+-port      => $o_port,
+-timeout   => $o_timeout
+);
+if (!defined($session)) {
+printf("ERROR: %s.\n", $error);
+exit $ERRORS{"UNKNOWN"};
+}
+my $resultat=undef;
+# Get rid of UTF8 translation in case of accentuated caracters (thanks to Dimo Velev).
+#ÕÀû̫¿´¶®perldoc£¬²²â²»¿ªÆMIBºÍidµÄª»»£¬ÕÑÊ³öû¼ò¬²»¹ýôäÐ½áºÁÞ°Ï
+$session->translate(Net::SNMP->TRANSLATE_NONE);
+#ȡֵµĹؼü_request·µ»Ø»¸öhµÄý#perldocµÄ­ÎÊ£º¡°A reference to a hash is returned in blocking mode which contains the contents of the VarBindList.  In non-blocking mode, a true value is returned when no error has occurred.¡±
+#get_request()Ö-callbackºÍdelayÊnon-blockingģʽµģ¬¶ødsÊblockingģʽ¡£
+#Ҳ¾ÍÇµÕ¸ö¾À·µ»صÄÇ»¸öá£
+if (Net::SNMP->VERSION &lt; 4) {
+$resultat = $session->get_request(@oidlist);
+} else {
+$resultat = $session->get_request(-varbindlist  => \@oidlist);
+}
+if (!defined($resultat)) {
+printf("ERROR: Description/Type table : %s.\n", $session->error);
+$session->close;
+exit $ERRORS{"UNKNOWN"};
+}
+$session->close;
+my $new_nfs_ops;
+my $left_shift= 2**32;
+my $last_nfs_ops = 0;
+my $row ;
+my  $last_check_time ;
+my  $update_time;
+my @last_values=undef;
+my $flg_created = 0;
+#½âÓ¹ؼüÔ$resultatµĽâÓ$$resultat{$oids{nfsHighOps}}£¬ÆÖ$oids{nfsHighOps}ÊÁһ¸öh??%oidsÖµÄµ¡£
+#¿ÉԲÉÃoreach my $value ( values %$resultat ) { print "$value\n"; }µķ½ʽÁ³öhÖµĸ÷µ¡£
+#°´ÕMSBsºÍSBsµĻ®·ַ½·¨£¬ͨ¹ýµķ½ʽºϲ¢µõ½64bits¼Æýew_nfs_ops= $$resultat{$oids{nfsHighOps}} *  $left_shift  +  $$resultat{$oids{nfsLowOps}};
+#Ê³öı¾Î¼þ£¬ÒΪÊ¸øos×¼à½ű¾£¬ËÒ±Øë¹ýķ½ʽ¼ÆãerageÐÊֵ£¬¶øcacti»æʱÄÑ¿ÉÔ±½Ӵ«µÝounterÐÊֵ¡£
+if (-e "/tmp/traffic_ops_".$o_host) {
+open(FILE,"&lt;"."/tmp/traffic_ops_".$o_host);
+while($row = &lt;FILE>){
+@last_values = split(":",$row);
+$last_check_time = $last_values[0];
+$last_nfs_ops = $last_values[1];
+$flg_created = 1;
+}
+close(FILE);
+} else {
+$flg_created = 0;
+}
+$update_time = time();
+unless (open(FILE,">"."/tmp/traffic_ops_".$o_host)){
+print "Check mod for temporary file : /tmp/traffic_ops_".$o_host. " !\n";
+exit $ERRORS{"UNKNOWN"};
+}
+print FILE "$update_time:$new_nfs_ops:$new_cifs_ops";
+close(FILE);
+if ($flg_created == 0){
+print "First execution : Buffer in creation.... \n";
+exit($ERRORS{"UNKNOWN"});
+}
+my $nfs_diff=$new_nfs_ops - $last_nfs_ops;
+$nfs_diff=$new_nfs_ops if ($nfs_diff &lt; 0);
+my $time_diff=$update_time - $last_check_time;
+$time_diff=$update_time if ($time_diff &lt; 0);
+my $nfs_ops = $nfs_diff / ( $time_diff );
+printf("Nfs ops : %.2f ops/sec ", $nfs_ops);
+printf("|nfsOps=".$nfs_ops."\n");
+exit($ERRORS{"OK"});

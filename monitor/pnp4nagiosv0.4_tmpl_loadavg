@@ -1,0 +1,22 @@
+<?php
+$opt[1] = "--vertical-label Load -l0  --title \"CPU Load for $hostname / $servicedesc\" ";
+$def[1] =  "DEF:var1=$rrdfile:$DS[1]:AVERAGE " ;
+$def[1] .= "DEF:var2=$rrdfile:$DS[2]:AVERAGE " ;
+$def[1] .= "DEF:var3=$rrdfile:$DS[3]:AVERAGE " ;
+$def[1] .= "CDEF:total=var1,var2,+,var3,+ " ;
+$def[1] .= "HRULE:$WARN[1]#FFFF00 ";
+$def[1] .= "HRULE:$CRIT[1]#FF0000 ";
+$def[1] .= "AREA:var1#FFD700:\"load 1 \" " ;
+$def[1] .= "GPRINT:var1:LAST:\"%6.2lf last\" " ;
+$def[1] .= "GPRINT:var1:AVERAGE:\"%6.2lf avg\" " ;
+$def[1] .= "GPRINT:var1:MAX:\"%6.2lf max\\n\" ";
+$def[1] .= "AREA:var2#7FFF00:\"Load 5 \":STACK " ;
+$def[1] .= "GPRINT:var2:LAST:\"%6.2lf last\" " ;
+$def[1] .= "GPRINT:var2:AVERAGE:\"%6.2lf avg\" " ;
+$def[1] .= "GPRINT:var2:MAX:\"%6.2lf max\\n\" " ;
+$def[1] .= "AREA:var3#FF0000:\"Load 15\":STACK " ;
+$def[1] .= "GPRINT:var3:LAST:\"%6.2lf last\" " ;
+$def[1] .= "GPRINT:var3:AVERAGE:\"%6.2lf avg\" " ;
+$def[1] .= "GPRINT:var3:MAX:\"%6.2lf max\\n\" " ;
+$def[1] .= "LINE1:total#000000 " ;
+?>
