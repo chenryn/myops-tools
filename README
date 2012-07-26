@@ -5,4 +5,4 @@ c) A perl module using to manage linux cluster by ssh/expect/fork;
 d) Some scripts wrote for check_nrpe.
 e) A shell cgi demo using to distribute squid's configurations for customers. Wrote with sshpass and sed.
 f) A dynamic dns demo wrote by perl and its Stanford::DNSserver module, the demo's intention is to support response DNS query by views/weights/health_check/autoload and so on.
-g) A web accelerate effect monitor demo wrote by perl and funsioncharts.
+g) A web accelerate effect monitor demo wrote by perl dancer framework and funsioncharts.
